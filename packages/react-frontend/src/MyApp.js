@@ -15,10 +15,25 @@ function MyApp() {
       }, [] );
 
     function removeOneCharacter(index) {
-        const updated = characters.filter((character, i) => {
-            return i !== index;
-        });
-        setCharacters(updated);
+        const remove = characters[index];
+        const charId = remove.id;
+
+        fetch(`Http://localhost:8000/users/${charId}`, {
+          method: "DELETE"
+        })
+        .then(response => {
+            if (response.status === 204) {
+                const updated = characters.filter((character, i) => {
+                    return i !== index;
+                });
+                setCharacters(updated);
+            } else {
+                throw new Error(`Delete: Unexpected status code ${response.status}`);
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        }) 
     }
 
     function postUser(person) {
@@ -30,14 +45,23 @@ function MyApp() {
           body: JSON.stringify(person),
         });
         return promise;
-      }
+    }
 
-      function updateList(person) { 
+    function updateList(person) { 
         postUser(person)
-          .then(() => setCharacters([...characters, person]))
-          .catch((error) => {
-            console.log(error);
-          })
+            .then(response => {
+                if (response.status === 201) {
+                    response.json().then(newUser => {
+                        setCharacters([...characters, newUser]);
+                    });
+                } 
+                else {
+                    throw new Error(`Post: Unexpected status code ${response.status}`);
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
     
     function fetchUsers() {

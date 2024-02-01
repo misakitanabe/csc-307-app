@@ -96,14 +96,16 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
+    const randomId = Math.random().toString();
+    user.id = randomId;
     users["users_list"].push(user);
     return user;
   };
   
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    const updatedUser = addUser(userToAdd);
+    res.status(201).send(updatedUser);
 });
 
 app.delete("/users/:id", (req, res) => {
@@ -113,7 +115,7 @@ app.delete("/users/:id", (req, res) => {
       res.status(404).send("Resource not found.");
     } else {
       users["users_list"].splice(index, 1);
-      res.send();
+      res.status(204).send();
     }
   });
   
