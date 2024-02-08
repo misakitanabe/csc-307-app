@@ -14,17 +14,14 @@ function MyApp() {
             .catch((error) => { console.log(error); });
       }, [] );
 
-    function removeOneCharacter(index) {
-        const remove = characters[index];
-        const charId = remove.id;
-
+    function removeOneCharacter(charId) {
         fetch(`Http://localhost:8000/users/${charId}`, {
           method: "DELETE"
         })
         .then(response => {
             if (response.status === 204) {
-                const updated = characters.filter((character, i) => {
-                    return i !== index;
+                const updated = characters.filter((character) => {
+                    return character._id !== charId;
                 });
                 setCharacters(updated);
             } else {
@@ -52,8 +49,10 @@ function MyApp() {
             .then(response => {
                 if (response.status === 201) {
                     response.json().then(newUser => {
-                        setCharacters([...characters, newUser]);
-                    });
+                        setCharacters([...characters, newUser]); // not appending new user
+                        console.log("characters: ", characters);
+                        console.log("new: ", newUser);
+                    });                    
                 } 
                 else {
                     throw new Error(`Post: Unexpected status code ${response.status}`);
@@ -81,3 +80,5 @@ function MyApp() {
 }
 
 export default MyApp;
+
+// to run: npm start
